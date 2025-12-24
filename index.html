@@ -5,129 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Red Finger Store - Neon</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Background tidak polos: Menggunakan gradasi soft dan pattern */
-        body { 
-            background: radial-gradient(circle at top right, #e0f2fe, #f3f4f6);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        .selected-item { 
-            border-color: #2563eb !important; 
-            background-color: #eff6ff !important; 
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
-        }
-
-        .product-card { transition: all 0.2s ease-in-out; }
-        
-        #qris-modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 100; 
-            inset: 0; 
-            background: rgba(15, 23, 42, 0.9); 
-            backdrop-filter: blur(8px); 
-        }
-
-        /* Dekorasi tambahan agar tidak polos */
-        .bg-pattern {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            opacity: 0.05;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232563eb' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-    </style>
-</head>
-<body class="pb-10">
-    <div class="bg-pattern"></div>
-
-    <header class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white pt-10 pb-16 px-6 text-center shadow-2xl rounded-b-[3rem]">
-        <h1 class="text-4xl font-black tracking-tight mb-2 uppercase italic">Neon Store</h1>
-        <p class="text-blue-100 font-medium tracking-widest text-xs opacity-80 uppercase">Red Finger Redeem Code & Joki Service</p>
-    </header>
-
-    <div class="max-w-4xl mx-auto px-4 -mt-10">
-        
-        <div class="bg-white/90 backdrop-blur border-l-8 border-blue-600 p-5 mb-8 rounded-2xl shadow-xl">
-            <h3 class="font-bold text-blue-700 mb-1 flex items-center gap-2">
-                📢 ATURAN JOKI
-            </h3>
-            <p class="text-[11px] text-gray-600 leading-relaxed font-semibold uppercase">
-                Joki sepaket dengan code • Code wajib dari admin • Akun wajib diamankan buyer setelah selesai.
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <h2 class="text-lg font-black text-blue-900 flex items-center gap-2">
-                    <span class="w-2 h-6 bg-blue-600 rounded-full"></span> DAFTAR CODE
-                </h2>
-                <div id="list-code" class="space-y-3"></div>
-            </div>
-
-            <div class="space-y-4">
-                <h2 class="text-lg font-black text-blue-900 flex items-center gap-2">
-                    <span class="w-2 h-6 bg-cyan-500 rounded-full"></span> JASA JOKI
-                </h2>
-                <div id="list-joki" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <div class="mt-10 bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 md:p-8">
-            <h2 class="text-xl font-black text-center text-gray-800 mb-6 uppercase tracking-widest">Detail Pesanan</h2>
-            
-            <div class="bg-gray-50 rounded-2xl p-5 border-2 border-dashed border-gray-200 mb-6 text-center">
-                <div id="cart-items" class="text-sm font-bold text-blue-600 space-y-2 mb-3">
-                    <span class="text-gray-400 font-normal">Belum ada paket dipilih...</span>
-                </div>
-                <div class="text-2xl font-black text-gray-900 border-t pt-3 flex justify-between items-center px-4">
-                    <span class="text-sm text-gray-500 uppercase">Total:</span>
-                    <span id="total-price" class="text-blue-600">Rp 0</span>
-                </div>
-            </div>
-
-            <div class="space-y-4 mb-8">
-                <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Nama Buyer</label>
-                    <input type="text" id="buyer-name" placeholder="Masukkan Nickname Anda" class="w-full bg-gray-50 p-4 rounded-2xl border-2 border-transparent focus:border-blue-500 outline-none font-bold transition-all shadow-inner">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button onclick="showQRIS()" class="bg-slate-800 text-white font-black py-4 rounded-2xl hover:bg-slate-900 transition flex items-center justify-center gap-2 shadow-lg">
-                    🖼️ LIHAT QRIS
-                </button>
-                <button onclick="sendToWhatsApp()" class="bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg">
-                    💬 PESAN SEKARANG
-                </button>
-            </div>
-            <button onclick="resetCart()" class="w-full mt-6 text-gray-400 text-[10px] font-black uppercase hover:text-red-500 transition tracking-widest">Reset Pilihan</button>
-        </div>
-    </div>
-
-    <div id="qris-modal" class="flex items-center justify-center p-4" onclick="hideQRIS()">
-        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 text-center relative shadow-2xl border-4 border-blue-600" onclick="event.stopPropagation()">
-            <button onclick="hideQRIS()" class="absolute -top-3 -right-3 bg-red-500 text-white w-10 h-10 rounded-full font-bold shadow-xl">&times;</button>
-            <h3 class="text-xl font-black text-gray-800 mb-1">QRIS NEON STORE</h3>
-            <p class="text-[9px] text-blue-500 font-black uppercase mb-4 tracking-tighter">Scan untuk memproses pesanan</p>
-            
-            <div class="bg-gray-100 p-2 rounded-2xl mb-4 border-2 border-gray-50 shadow-inner">
-                <img src="https://raw.githubusercontent.com/neon300901/red-finger/main/295130.jpg" 
-                     class="w-full rounded-xl"
-                     onerror="this.src='https://via.placeholder.com/400x550?text=Gambar+QRIS+Error+Cek+Nama+File'">
-            </div>
-            
-            <p class="text-[10px] text-gray-400 font-bold italic">Simpan/Screenshot QRIS di atas untuk membayar.</p>
-        </div>
-    </div>
-
     <script>
         const myPhoneNumber = "6282322818690"; 
         let cart = [];
-
         const codeProducts = [
             { id: 1, name: "VIP 7D", price: 21000 },
             { id: 2, name: "VIP 30D", price: 63000 },
@@ -136,39 +16,93 @@
             { id: 5, name: "SVIP 7D", price: 47000 },
             { id: 6, name: "SVIP 30D", price: 136000 }
         ];
-
         const jokiProducts = [
             { id: 7, name: "Joki War Normal", price: 12000, desc: "Proses 10M-3D" },
             { id: 8, name: "Joki Prio", price: 20000, desc: "Bebas Antri + Setting" },
             { id: 9, name: "Joki Req Server SG", price: 35000, desc: "Server High Quality" }
         ];
 
-        function render() {
+        function initApp() {
             const codeC = document.getElementById('list-code');
             const jokiC = document.getElementById('list-joki');
-            
-            codeC.innerHTML = ''; 
-            jokiC.innerHTML = '';
-
+            codeC.innerHTML = ''; jokiC.innerHTML = '';
             codeProducts.forEach(p => {
                 const d = document.createElement('div');
                 d.id = `prod-${p.id}`;
-                d.className = "product-card bg-white p-4 rounded-2xl border-2 border-white shadow-sm cursor-pointer flex justify-between items-center hover:shadow-md";
-                d.innerHTML = `<div><p class="font-black text-gray-800 text-sm">${p.name}</p><p class="text-blue-600 font-black">Rp ${p.price.toLocaleString()}</p></div><div class="text-blue-200 font-black">+</div>`;
+                d.className = "bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-sm cursor-pointer flex justify-between items-center transition-all";
+                d.innerHTML = `<div><p class="font-black text-gray-800 text-sm">${p.name}</p><p class="text-blue-600 font-black">Rp ${p.price.toLocaleString()}</p></div><div class="text-blue-200 font-bold">+</div>`;
                 d.onclick = () => toggleCart(p);
                 codeC.appendChild(d);
             });
-
             jokiProducts.forEach(p => {
                 const d = document.createElement('div');
                 d.id = `prod-${p.id}`;
-                d.className = "product-card bg-white p-4 rounded-2xl border-2 border-white shadow-sm cursor-pointer flex justify-between items-center hover:shadow-md";
-                d.innerHTML = `<div><p class="font-black text-gray-800 text-sm">${p.name}</p><p class="text-cyan-600 font-black">Rp ${p.price.toLocaleString()}</p><p class="text-[9px] text-gray-400 font-bold uppercase">${p.desc}</p></div><div class="text-cyan-200 font-black">+</div>`;
+                d.className = "bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-sm cursor-pointer flex justify-between items-center transition-all";
+                d.innerHTML = `<div><p class="font-black text-gray-800 text-sm">${p.name}</p><p class="text-cyan-600 font-black text-sm">Rp ${p.price.toLocaleString()}</p><p class="text-[9px] text-gray-400 font-bold uppercase">${p.desc}</p></div><div class="text-cyan-200 font-bold">+</div>`;
                 d.onclick = () => toggleCart(p);
                 jokiC.appendChild(d);
             });
         }
+    </script>
+    <style>
+        body { background: radial-gradient(circle at top right, #e0f2fe, #f3f4f6); min-height: 100vh; font-family: sans-serif; }
+        .selected-item { border-color: #2563eb !important; background-color: #eff6ff !important; transform: scale(1.02); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
+        #qris-modal { display: none; position: fixed; z-index: 100; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body onload="initApp()" class="pb-10">
 
+    <header class="bg-gradient-to-br from-blue-700 to-indigo-800 text-white pt-10 pb-16 px-6 text-center shadow-2xl rounded-b-[3rem]">
+        <h1 class="text-4xl font-black uppercase italic tracking-tighter">Neon Store</h1>
+        <p class="text-blue-100 text-xs font-bold tracking-widest opacity-80 mt-1">RED FINGER REDEEM CODE & JOKI</p>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 -mt-10">
+        <div class="bg-white border-l-8 border-blue-600 p-5 mb-8 rounded-2xl shadow-xl text-[11px] font-bold uppercase text-gray-600">
+            Joki sepaket dengan code • Code wajib dari admin • Akun wajib diamankan buyer.
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <h2 class="text-lg font-black text-blue-900 px-2 border-l-4 border-blue-600 uppercase">Daftar Code</h2>
+                <div id="list-code" class="space-y-3"></div>
+            </div>
+            <div class="space-y-4">
+                <h2 class="text-lg font-black text-blue-900 px-2 border-l-4 border-cyan-500 uppercase">Jasa Joki</h2>
+                <div id="list-joki" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div class="mt-10 bg-white rounded-3xl shadow-2xl border p-6 md:p-8">
+            <h2 class="text-xl font-black text-center text-gray-800 mb-6 uppercase italic">Detail Pesanan</h2>
+            <div class="bg-gray-50 rounded-2xl p-5 border-2 border-dashed mb-6 text-center">
+                <div id="cart-items" class="text-sm font-bold text-blue-600 space-y-2 mb-3">Pilih produk di atas...</div>
+                <div class="text-2xl font-black text-gray-900 border-t pt-3 flex justify-between items-center px-4">
+                    <span class="text-sm text-gray-400">TOTAL:</span>
+                    <span id="total-price" class="text-blue-600">Rp 0</span>
+                </div>
+            </div>
+            <input type="text" id="buyer-name" placeholder="Masukkan Nickname" class="w-full bg-gray-50 p-4 rounded-2xl border-2 mb-6 focus:border-blue-500 outline-none font-bold text-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="showQRIS()" class="bg-slate-800 text-white font-black py-4 rounded-2xl shadow-lg uppercase">Lihat QRIS</button>
+                <button onclick="sendToWhatsApp()" class="bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase">Pesan (WA)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qris-modal" class="flex items-center justify-center p-4" onclick="hideQRIS()">
+        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 text-center relative shadow-2xl" onclick="event.stopPropagation()">
+            <button onclick="hideQRIS()" class="absolute -top-3 -right-3 bg-red-500 text-white w-10 h-10 rounded-full font-bold shadow-xl">X</button>
+            <h3 class="text-xl font-black text-gray-800 mb-4">QRIS NEON STORE</h3>
+            <div class="bg-gray-100 p-2 rounded-2xl mb-4 border shadow-inner overflow-hidden">
+                <img id="qris-img" src="295130.jpg" class="w-full rounded-xl shadow-md min-h-[200px]" alt="Memuat QRIS...">
+            </div>
+            <button onclick="reloadImage()" class="text-[10px] text-blue-600 font-bold mb-4 underline">Gambar tidak muncul? Klik Refresh</button>
+            <p class="text-[10px] text-gray-400 font-bold italic uppercase">Silakan SS dan scan untuk membayar.</p>
+        </div>
+    </div>
+
+    <script>
         function toggleCart(product) {
             const index = cart.findIndex(item => item.id === product.id);
             const el = document.getElementById(`prod-${product.id}`);
@@ -181,42 +115,34 @@
             }
             updateCartUI();
         }
-
         function updateCartUI() {
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('total-price');
             if (cart.length === 0) {
-                container.innerHTML = `<span class="text-gray-400 font-normal">Belum ada paket dipilih...</span>`;
+                container.innerHTML = `<span class="text-gray-400 font-normal italic">Pilih produk di atas...</span>`;
                 totalEl.innerHTML = "Rp 0";
                 return;
             }
-            container.innerHTML = cart.map(i => `<div class="bg-white p-2 rounded-lg mb-1 shadow-sm flex justify-between px-4 italic"><span>${i.name}</span><span>Rp ${i.price.toLocaleString()}</span></div>`).join('');
+            container.innerHTML = cart.map(i => `<div class="bg-white p-2 rounded-lg mb-1 shadow-sm flex justify-between px-4 italic border text-[12px]"><span>${i.name}</span><span>Rp ${i.price.toLocaleString()}</span></div>`).join('');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             totalEl.innerHTML = `Rp ${total.toLocaleString()}`;
         }
-
-        function resetCart() {
-            cart = [];
-            document.querySelectorAll('.selected-item').forEach(el => el.classList.remove('selected-item'));
-            updateCartUI();
-        }
-
         function showQRIS() { document.getElementById('qris-modal').style.display = 'flex'; }
         function hideQRIS() { document.getElementById('qris-modal').style.display = 'none'; }
+        
+        function reloadImage() {
+            const img = document.getElementById('qris-img');
+            img.src = "https://raw.githubusercontent.com/neon300901/red-finger/main/295130.jpg?t=" + new Date().getTime();
+        }
 
         function sendToWhatsApp() {
             const name = document.getElementById('buyer-name').value;
-            if (!name || cart.length === 0) { alert("Wajib isi nama dan pilih paket bosku!"); return; }
+            if (!name || cart.length === 0) { alert("Isi nama dan pilih paket!"); return; }
             const itemsStr = cart.map(i => `✅ ${i.name} (Rp ${i.price.toLocaleString()})`).join('%0A');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const msg = `*PESANAN BARU - NEON STORE*%0A------------------------------------%0A👤 *Nama:* ${name}%0A🛒 *Item:*%0A${itemsStr}%0A------------------------------------%0A💰 *TOTAL:* Rp ${total.toLocaleString()}%0A------------------------------------%0AHalo Admin, saya mau order paket di atas. Saya sudah cek QRIS, mohon instruksinya!`;
+            const msg = `*ORDER NEON STORE*%0A-----------------------%0A👤 *Nama:* ${name}%0A🛒 *Item:*%0A${itemsStr}%0A-----------------------%0A💰 *TOTAL:* Rp ${total.toLocaleString()}%0A-----------------------%0AHalo Min, saya sudah order paket di atas. Mohon diproses!`;
             window.open(`https://wa.me/${myPhoneNumber}?text=${msg}`, '_blank');
         }
-
-        // Pancingan agar list PASTI muncul saat web terbuka
-        document.addEventListener("DOMContentLoaded", function() {
-            render();
-        });
     </script>
 </body>
 </html>
