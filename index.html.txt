@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Finger Store - Code & Joki</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f9fafb; font-family: sans-serif; }
+        .product-card:hover { border-color: #ef4444; transform: translateY(-2px); }
+        /* Style untuk Modal */
+        #qris-modal { display: none; position: fixed; z-index: 50; inset: 0; background: rgba(0,0,0,0.7); }
+    </style>
+</head>
+<body>
+
+    <header class="bg-red-600 text-white p-6 text-center shadow-xl">
+        <h1 class="text-3xl font-extrabold tracking-tight">RED FINGER STORE</h1>
+        <p class="text-sm mt-1 opacity-90 text-yellow-200 uppercase font-bold text-xs">Aman • Cepat • Terpercaya</p>
+    </header>
+
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 text-sm text-blue-800 rounded shadow-sm">
+            <h3 class="font-bold text-lg mb-2 underline">Syarat & Ketentuan Joki:</h3>
+            <ul class="list-disc ml-5 space-y-1">
+                <li><b>CODE HARUS DARI ADMIN</b> (Sepaket, tidak bisa terpisah).</li>
+                <li>Waktu selesai joki war tidak pasti (tergantung stok server).</li>
+                <li>Akun wajib dari buyer & amankan sendiri setelah selesai.</li>
+            </ul>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold mb-4 text-gray-800 border-b-2 border-red-500 inline-block">Daftar Harga Code</h2>
+                <div class="space-y-3" id="list-code"></div>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold mb-4 text-gray-800 border-b-2 border-blue-500 inline-block">Jasa Joki (Inc. Code)</h2>
+                <div class="space-y-3" id="list-joki"></div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+            <h3 class="text-xl font-bold mb-6 text-center text-gray-800 italic">--- Form Pemesanan ---</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700">Nama Pembeli</label>
+                    <input type="text" id="buyer-name" placeholder="Masukkan nama Anda" class="w-full p-3 border rounded-xl mt-1 outline-none border-gray-300 focus:ring-2 focus:ring-red-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700">Produk Dipilih</label>
+                    <input type="text" id="selected-product" readonly placeholder="Klik paket di atas" class="w-full p-3 border rounded-xl mt-1 bg-gray-50 text-red-600 font-bold outline-none">
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-3 mt-4">
+                <button onclick="showQRIS()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition flex justify-center items-center gap-2">
+                    <span>Lihat QRIS Pembayaran</span>
+                </button>
+                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md transition flex justify-center items-center gap-2">
+                    Konfirmasi via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qris-modal" class="flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center relative">
+            <button onclick="hideQRIS()" class="absolute top-3 right-4 text-gray-500 text-2xl font-bold">&times;</button>
+            <h3 class="text-lg font-bold mb-4">Scan QRIS a/n NEON</h3>
+            <img src="295130.jpg" alt="QRIS NEON" class="w-full rounded-lg shadow-inner mb-4">
+            <p class="text-xs text-gray-500">Silakan SS dan scan di aplikasi bank/e-wallet kamu. Simpan bukti transfer untuk dikirim ke WhatsApp.</p>
+            <button onclick="hideQRIS()" class="mt-4 w-full bg-gray-200 py-2 rounded-lg font-bold">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        const myPhoneNumber = "6282322818690"; 
+
+        const codeProducts = [
+            { name: "VIP 7D", price: "21.000" },
+            { name: "VIP 30D", price: "63.000" },
+            { name: "KVIP 7D", price: "38.000" },
+            { name: "KVIP 30D", price: "105.000" },
+            { name: "SVIP 7D", price: "47.000" },
+            { name: "SVIP 30D", price: "136.000" }
+        ];
+
+        const jokiProducts = [
+            { name: "Joki War Normal", price: "12.000", desc: "Proses 10M-3D, Bonus SG (Hoki)" },
+            { name: "Joki Prio", price: "20.000", desc: "No Antri + Free Setting RF" },
+            { name: "Joki Req Server SG", price: "35.000", desc: "Tingkat kesulitan tinggi" }
+        ];
+
+        function renderProducts() {
+            const codeContainer = document.getElementById('list-code');
+            const jokiContainer = document.getElementById('list-joki');
+
+            codeProducts.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm cursor-pointer product-card transition-all flex justify-between items-center";
+                div.innerHTML = `<div><p class="font-bold text-gray-800">${item.name}</p><p class="text-red-600 font-bold">Rp ${item.price}</p></div><span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold">Pilih</span>`;
+                div.onclick = () => selectItem(item.name, item.price, "CODE");
+                codeContainer.appendChild(div);
+            });
+
+            jokiProducts.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm cursor-pointer product-card transition-all";
+                div.innerHTML = `<div class="flex justify-between items-start"><div><p class="font-bold text-gray-800">${item.name}</p><p class="text-blue-600 font-bold">Rp ${item.price}</p></div><span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold">Pilih</span></div><p class="text-[10px] text-gray-500 mt-1 italic">${item.desc}</p>`;
+                div.onclick = () => selectItem(item.name, item.price, "JOKI");
+                jokiContainer.appendChild(div);
+            });
+        }
+
+        function selectItem(name, price, type) {
+            document.getElementById('selected-product').value = `[${type}] ${name} - Rp ${price}`;
+        }
+
+        function showQRIS() {
+            document.getElementById('qris-modal').style.display = 'flex';
+        }
+
+        function hideQRIS() {
+            document.getElementById('qris-modal').style.display = 'none';
+        }
+
+        function sendToWhatsApp() {
+            const name = document.getElementById('buyer-name').value;
+            const product = document.getElementById('selected-product').value;
+
+            if (!name || !product) {
+                alert("Silakan isi nama dan pilih produk!");
+                return;
+            }
+
+            const message = `*PESANAN RED FINGER - NEON STORE*\n` +
+                            `------------------------------\n` +
+                            `*Nama:* ${name}\n` +
+                            `*Pesanan:* ${product}\n` +
+                            `*Metode:* QRIS (Neon)\n` +
+                            `------------------------------\n` +
+                            `Saya sudah melakukan pembayaran/akan membayar via QRIS. Mohon diproses min!`;
+
+            const url = `https://wa.me/${myPhoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
