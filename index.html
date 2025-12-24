@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #f9fafb; font-family: sans-serif; }
-        .selected-item { border-color: #ef4444 !important; background-color: #fef2f2; }
+        .selected-item { border-color: #ef4444 !important; background-color: #fef2f2; position: relative; }
+        .selected-item::after { content: '✓'; position: absolute; top: 10px; right: 10px; color: #ef4444; font-weight: bold; }
         #qris-modal { display: none; position: fixed; z-index: 50; inset: 0; background: rgba(0,0,0,0.8); }
     </style>
 </head>
@@ -22,53 +23,173 @@
         
         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 text-sm text-blue-800 rounded shadow-sm">
             <h3 class="font-bold text-lg mb-2 underline">Aturan Jasa Joki:</h3>
-            <ul class="list-disc ml-5 space-y-1 font-medium">
-                <li>JASA JOKI = SEPAKET SAMA CODE.</li>
+            <ul class="list-disc ml-5 space-y-1 font-medium text-[12px] md:text-sm">
+                <li>JASA JOKI = SEPAKET SAMA CODE (TIDAK BISA TERPISAH).</li>
                 <li>CODE HARUS DARI ADMIN.</li>
-                <li>Akun wajib dari buyer & amankan sendiri setelah selesai.</li>
+                <li>Waktu selesai tidak pasti (tergantung stok server).</li>
+                <li>Akun wajib dari buyer & amankan sendiri setelah proses joki selesai.</li>
             </ul>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
                 <h2 class="text-xl font-bold mb-4 text-gray-800 border-b-2 border-red-500 inline-block">Daftar Code</h2>
-                <div class="space-y-3" id="list-code"></div>
+                <div class="space-y-3" id="list-code">
+                    </div>
             </div>
 
             <div>
                 <h2 class="text-xl font-bold mb-4 text-gray-800 border-b-2 border-blue-500 inline-block">Daftar Jasa Joki</h2>
-                <div class="space-y-3" id="list-joki"></div>
+                <div class="space-y-3" id="list-joki">
+                    </div>
             </div>
         </div>
 
         <div class="mt-12 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
-            <h3 class="text-xl font-bold mb-6 text-center text-gray-800 italic">--- DETAIL PESANAN ---</h3>
+            <h3 class="text-xl font-bold mb-6 text-center text-gray-800">--- DETAIL PESANAN ---</h3>
             
             <div class="mb-6 bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
                 <p class="text-sm font-bold text-gray-600 mb-2">Item Terpilih:</p>
-                <div id="cart-items" class="text-red-600 font-bold space-y-1 mb-2">Belum ada item dipilih...</div>
-                <div class="border-t pt-2 text-gray-800 font-extrabold text-lg">Total: <span id="total-price">Rp 0</span></div>
+                <div id="cart-items" class="text-red-600 font-bold text-sm space-y-1 mb-2 italic">Belum ada item dipilih...</div>
+                <div class="border-t pt-2 text-gray-800 font-extrabold text-lg flex justify-between">
+                    <span>Total Pembayaran:</span>
+                    <span id="total-price">Rp 0</span>
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700">Nama Pembeli</label>
-                <input type="text" id="buyer-name" placeholder="Nama Anda" class="w-full p-3 border rounded-xl mt-1 outline-none focus:ring-2 focus:ring-red-500 border-gray-300">
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700">Nama / Nickname Buyer</label>
+                <input type="text" id="buyer-name" placeholder="Masukkan Nama Anda" class="w-full p-3 border rounded-xl mt-1 outline-none focus:ring-2 focus:ring-red-500 border-gray-300">
             </div>
 
             <div class="flex flex-col md:flex-row gap-3">
-                <button onclick="showQRIS()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition">
+                <button onclick="showQRIS()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition transform active:scale-95">
                     Lihat QRIS Pembayaran
                 </button>
-                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md transition">
+                <button onclick="sendToWhatsApp()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md transition transform active:scale-95">
                     Pesan via WhatsApp
                 </button>
             </div>
-            <button onclick="resetCart()" class="w-full mt-4 text-gray-400 text-xs hover:underline text-center">Reset Pilihan</button>
+            <button onclick="resetCart()" class="w-full mt-4 text-gray-400 text-[10px] hover:underline text-center uppercase tracking-widest">Reset Semua Pilihan</button>
         </div>
     </div>
 
     <div id="qris-modal" class="flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center relative shadow-2xl">
             <button onclick="hideQRIS()" class="absolute top-2 right-4 text-gray-500 text-3xl">&times;</button>
-            <h3 class="text-lg font-bold mb-4 text-gray-800">SCAN QRIS NEON</h3>
-            <img src="https://raw.githubusercontent.com/neon300901/red-finger/main/295130.jpg" alt="QRIS NEON" class="w-full rounded-lg shadow-md mb-4 border border-gray
+            <h3 class="text-lg font-bold mb-4 text-gray-800 uppercase">QRIS NEON STORE</h3>
+            <img src="https://raw.githubusercontent.com/neon300901/red-finger/main/295130.jpg" alt="QRIS NEON" class="w-full rounded-lg shadow-md mb-4 border border-gray-100">
+            <p class="text-[10px] text-gray-500 font-medium italic mb-2">Silakan Screenshot & Scan di Aplikasi Bank / E-Wallet Anda.</p>
+            <button onclick="hideQRIS()" class="mt-2 w-full bg-gray-100 py-2 rounded-lg font-bold text-gray-700 hover:bg-gray-200 transition">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        const myPhoneNumber = "6282322818690"; 
+        let cart = [];
+
+        // DATA PRODUK
+        const codeProducts = [
+            { id: 1, name: "VIP 7D", price: 21000 },
+            { id: 2, name: "VIP 30D", price: 63000 },
+            { id: 3, name: "KVIP 7D", price: 38000 },
+            { id: 4, name: "KVIP 30D", price: 105000 },
+            { id: 5, name: "SVIP 7D", price: 47000 },
+            { id: 6, name: "SVIP 30D", price: 136000 }
+        ];
+
+        const jokiProducts = [
+            { id: 7, name: "Joki War Normal", price: 12000, desc: "Proses 10M-3D" },
+            { id: 8, name: "Joki Prio", price: 20000, desc: "No Antri + Free Setting" },
+            { id: 9, name: "Joki Req Server SG", price: 35000, desc: "Tingkat Kesulitan Tinggi" }
+        ];
+
+        // FUNGSI MENAMPILKAN PRODUK
+        function initApp() {
+            const codeC = document.getElementById('list-code');
+            const jokiC = document.getElementById('list-joki');
+
+            // Render Code
+            codeProducts.forEach(p => {
+                const d = document.createElement('div');
+                d.id = `prod-${p.id}`;
+                d.className = "bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm cursor-pointer transition-all flex justify-between items-center";
+                d.innerHTML = `<div><p class="font-bold text-gray-800">${p.name}</p><p class="text-red-600 font-bold">Rp ${p.price.toLocaleString()}</p></div>`;
+                d.onclick = () => toggleCart(p);
+                codeC.appendChild(d);
+            });
+
+            // Render Joki
+            jokiProducts.forEach(p => {
+                const d = document.createElement('div');
+                d.id = `prod-${p.id}`;
+                d.className = "bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm cursor-pointer transition-all flex justify-between items-center";
+                d.innerHTML = `<div><p class="font-bold text-gray-800">${p.name}</p><p class="text-blue-600 font-bold text-sm">Rp ${p.price.toLocaleString()}</p><p class="text-[10px] text-gray-400 italic">${p.desc}</p></div>`;
+                d.onclick = () => toggleCart(p);
+                jokiC.appendChild(d);
+            });
+        }
+
+        // FUNGSI PILIH PRODUK
+        function toggleCart(product) {
+            const index = cart.findIndex(item => item.id === product.id);
+            const el = document.getElementById(`prod-${product.id}`);
+
+            if (index > -1) {
+                cart.splice(index, 1);
+                el.classList.remove('selected-item');
+            } else {
+                cart.push(product);
+                el.classList.add('selected-item');
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('total-price');
+            
+            if (cart.length === 0) {
+                container.innerHTML = "Belum ada item dipilih...";
+                totalEl.innerHTML = "Rp 0";
+                return;
+            }
+
+            container.innerHTML = cart.map(i => `• ${i.name} (Rp ${i.price.toLocaleString()})`).join('<br>');
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            totalEl.innerHTML = `Rp ${total.toLocaleString()}`;
+        }
+
+        function resetCart() {
+            cart = [];
+            document.querySelectorAll('.selected-item').forEach(el => el.classList.remove('selected-item'));
+            updateCartUI();
+        }
+
+        function showQRIS() { document.getElementById('qris-modal').style.display = 'flex'; }
+        function hideQRIS() { document.getElementById('qris-modal').style.display = 'none'; }
+
+        function sendToWhatsApp() {
+            const name = document.getElementById('buyer-name').value;
+            if (!name || cart.length === 0) { alert("Tolong masukkan nama dan pilih produk dulu bosku!"); return; }
+
+            const itemsStr = cart.map(i => `- ${i.name} (Rp ${i.price.toLocaleString()})`).join('%0A');
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+            const msg = `*ORDER RED FINGER - NEON STORE*%0A` +
+                        `------------------------------%0A` +
+                        `*Nama Buyer:* ${name}%0A` +
+                        `*Item Pesanan:*%0A${itemsStr}%0A` +
+                        `------------------------------%0A` +
+                        `*TOTAL:* Rp ${total.toLocaleString()}%0A` +
+                        `------------------------------%0A` +
+                        `Halo Min, saya sudah pilih paket di atas. Mohon instruksi selanjutnya untuk pembayaran via QRIS/Akun.`;
+
+            window.open(`https://wa.me/${myPhoneNumber}?text=${msg}`, '_blank');
+        }
+
+        // Jalankan render saat halaman siap
+        window.onload = initApp;
+    </script>
+</body>
+</html>
