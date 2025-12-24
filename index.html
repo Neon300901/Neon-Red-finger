@@ -7,8 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #f9fafb; font-family: sans-serif; }
+        /* Style untuk menandai item yang dipilih */
         .selected-item { border-color: #ef4444 !important; background-color: #fef2f2; position: relative; }
         .selected-item::after { content: '✓'; position: absolute; top: 10px; right: 10px; color: #ef4444; font-weight: bold; }
+        /* Style untuk popup QRIS */
         #qris-modal { display: none; position: fixed; z-index: 50; inset: 0; background: rgba(0,0,0,0.8); }
     </style>
 </head>
@@ -48,15 +50,15 @@
             
             <div class="mb-6 bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
                 <p class="text-sm font-bold text-gray-600 mb-2">Item Terpilih:</p>
-                <div id="cart-items" class="text-red-600 font-bold text-sm space-y-1 mb-2 italic">Belum ada item dipilih...</div>
+                <div id="cart-items" class="text-red-600 font-bold text-sm space-y-1 mb-2 italic text-center">Belum ada item dipilih...</div>
                 <div class="border-t pt-2 text-gray-800 font-extrabold text-lg flex justify-between">
-                    <span>Total:</span>
+                    <span>Total Pembayaran:</span>
                     <span id="total-price">Rp 0</span>
                 </div>
             </div>
 
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700">Nama Buyer</label>
+                <label class="block text-sm font-semibold text-gray-700">Nama / Nickname Buyer</label>
                 <input type="text" id="buyer-name" placeholder="Masukkan Nama Anda" class="w-full p-3 border rounded-xl mt-1 outline-none focus:ring-2 focus:ring-red-500 border-gray-300 shadow-sm">
             </div>
 
@@ -68,26 +70,31 @@
                     Pesan via WhatsApp
                 </button>
             </div>
-            <button onclick="resetCart()" class="w-full mt-4 text-gray-400 text-[10px] hover:underline text-center uppercase tracking-widest">Reset Pilihan</button>
+            <button onclick="resetCart()" class="w-full mt-4 text-gray-400 text-[10px] hover:underline text-center uppercase tracking-widest">Reset Semua Pilihan</button>
         </div>
     </div>
 
     <div id="qris-modal" class="flex items-center justify-center p-4" onclick="hideQRIS()">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center relative shadow-2xl" onclick="event.stopPropagation()">
             <button onclick="hideQRIS()" class="absolute top-2 right-4 text-gray-400 text-3xl">&times;</button>
-            <h3 class="text-lg font-bold mb-4 text-gray-800">QRIS NEON STORE</h3>
+            <h3 class="text-lg font-bold mb-4 text-gray-800 uppercase tracking-wider">QRIS NEON STORE</h3>
             
-            <img id="qris-img" src="295130.jpg" alt="QRIS NEON" class="w-full rounded-lg shadow-md mb-4 border border-gray-100">
+            <img src="https://raw.githubusercontent.com/neon300901/red-finger/main/295130.jpg" 
+                 alt="QRIS NEON" 
+                 class="w-full rounded-lg shadow-md mb-4 border border-gray-100"
+                 onerror="this.src='https://via.placeholder.com/400x600?text=Scan+QRIS+Neon+Gagal+Muat'">
             
-            <p class="text-[10px] text-gray-500 font-medium italic mb-2">Silakan Screenshot & Scan di Aplikasi Bank / E-Wallet Anda.</p>
+            <p class="text-[10px] text-gray-500 font-medium italic mb-2 font-sans">Silakan Screenshot & Scan di Aplikasi Bank / E-Wallet Anda.</p>
             <button onclick="hideQRIS()" class="mt-2 w-full bg-gray-100 py-2 rounded-lg font-bold text-gray-700 hover:bg-gray-200 transition">Tutup</button>
         </div>
     </div>
 
     <script>
+        // Konfigurasi Nomor WhatsApp
         const myPhoneNumber = "6282322818690"; 
         let cart = [];
 
+        // Data Produk Code
         const codeProducts = [
             { id: 1, name: "VIP 7D", price: 21000 },
             { id: 2, name: "VIP 30D", price: 63000 },
@@ -97,12 +104,14 @@
             { id: 6, name: "SVIP 30D", price: 136000 }
         ];
 
+        // Data Produk Joki
         const jokiProducts = [
             { id: 7, name: "Joki War Normal", price: 12000, desc: "Proses 10M-3D" },
             { id: 8, name: "Joki Prio", price: 20000, desc: "No Antri + Free Setting" },
             { id: 9, name: "Joki Req Server SG", price: 35000, desc: "Tingkat Kesulitan Tinggi" }
         ];
 
+        // Fungsi Memunculkan Produk saat Web Dibuka
         function initApp() {
             const codeC = document.getElementById('list-code');
             const jokiC = document.getElementById('list-joki');
@@ -111,7 +120,7 @@
                 const d = document.createElement('div');
                 d.id = `prod-${p.id}`;
                 d.className = "bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm cursor-pointer transition-all flex justify-between items-center";
-                d.innerHTML = `<div><p class="font-bold text-gray-800 text-sm">${p.name}</p><p class="text-red-600 font-bold">Rp ${p.price.toLocaleString()}</p></div>`;
+                d.innerHTML = `<div><p class="font-bold text-gray-800 text-sm">${p.name}</p><p class="text-red-600 font-bold">Rp ${p.price.toLocaleString()}</p></div><span class="text-[10px] bg-gray-100 px-2 py-1 rounded">Pilih</span>`;
                 d.onclick = () => toggleCart(p);
                 codeC.appendChild(d);
             });
@@ -120,16 +129,13 @@
                 const d = document.createElement('div');
                 d.id = `prod-${p.id}`;
                 d.className = "bg-white p-4 rounded-xl border-2 border-gray-100 shadow-sm cursor-pointer transition-all flex justify-between items-center";
-                d.innerHTML = `<div><p class="font-bold text-gray-800 text-sm">${p.name}</p><p class="text-blue-600 font-bold text-sm">Rp ${p.price.toLocaleString()}</p><p class="text-[10px] text-gray-400 italic">${p.desc}</p></div>`;
+                d.innerHTML = `<div><p class="font-bold text-gray-800 text-sm">${p.name}</p><p class="text-blue-600 font-bold text-sm">Rp ${p.price.toLocaleString()}</p><p class="text-[10px] text-gray-400 italic">${p.desc}</p></div><span class="text-[10px] bg-gray-100 px-2 py-1 rounded">Pilih</span>`;
                 d.onclick = () => toggleCart(p);
                 jokiC.appendChild(d);
             });
-
-            // Force refresh image src to avoid cache
-            const qImg = document.getElementById('qris-img');
-            qImg.src = "295130.jpg?v=" + new Date().getTime();
         }
 
+        // Fungsi Pilih/Batal Pilih Produk
         function toggleCart(product) {
             const index = cart.findIndex(item => item.id === product.id);
             const el = document.getElementById(`prod-${product.id}`);
@@ -143,6 +149,7 @@
             updateCartUI();
         }
 
+        // Update Tampilan Keranjang
         function updateCartUI() {
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('total-price');
@@ -156,21 +163,24 @@
             totalEl.innerHTML = `Rp ${total.toLocaleString()}`;
         }
 
+        // Reset Pilihan
         function resetCart() {
             cart = [];
             document.querySelectorAll('.selected-item').forEach(el => el.classList.remove('selected-item'));
             updateCartUI();
         }
 
+        // Fungsi Buka Tutup QRIS
         function showQRIS() { document.getElementById('qris-modal').style.display = 'flex'; }
         function hideQRIS() { document.getElementById('qris-modal').style.display = 'none'; }
 
+        // Fungsi Kirim ke WhatsApp
         function sendToWhatsApp() {
             const name = document.getElementById('buyer-name').value;
-            if (!name || cart.length === 0) { alert("Masukkan nama dan pilih paket dulu!"); return; }
+            if (!name || cart.length === 0) { alert("Masukkan nama dan pilih paket dulu bos!"); return; }
             const itemsStr = cart.map(i => `- ${i.name} (Rp ${i.price.toLocaleString()})`).join('%0A');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const msg = `*ORDER RED FINGER - NEON STORE*%0A------------------------------%0A*Nama Buyer:* ${name}%0A*Item Pesanan:*%0A${itemsStr}%0A------------------------------%0A*TOTAL:* Rp ${total.toLocaleString()}%0A------------------------------%0AMohon instruksi selanjutnya min. Saya sudah cek QRIS.`;
+            const msg = `*PESANAN BARU - NEON STORE*%0A------------------------------%0A*Nama Buyer:* ${name}%0A*Item Pesanan:*%0A${itemsStr}%0A------------------------------%0A*TOTAL PEMBAYARAN:* Rp ${total.toLocaleString()}%0A------------------------------%0AHalo Min, saya sudah pilih paket di atas. Mohon instruksi selanjutnya untuk pembayaran via QRIS.`;
             window.open(`https://wa.me/${myPhoneNumber}?text=${msg}`, '_blank');
         }
 
