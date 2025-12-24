@@ -6,115 +6,121 @@
     <title>Red Finger Store - Neon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Background pattern agar tidak polos */
+        /* Background tidak polos: Menggunakan gradasi soft dan pattern */
         body { 
-            background-color: #f3f4f6;
-            background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-            font-family: 'Inter', sans-serif; 
+            background: radial-gradient(circle at top right, #e0f2fe, #f3f4f6);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         
-        /* Efek saat item dipilih */
         .selected-item { 
             border-color: #2563eb !important; 
-            background-color: #eff6ff; 
-            position: relative;
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
-        }
-        .selected-item::after { 
-            content: '✓'; 
-            position: absolute; 
-            top: 10px; 
-            right: 10px; 
-            color: #2563eb; 
-            font-weight: bold; 
+            background-color: #eff6ff !important; 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
         }
 
-        /* Animasi halus */
-        .product-card { transition: all 0.3s ease; }
+        .product-card { transition: all 0.2s ease-in-out; }
         
-        #qris-modal { display: none; position: fixed; z-index: 50; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); }
+        #qris-modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            inset: 0; 
+            background: rgba(15, 23, 42, 0.9); 
+            backdrop-filter: blur(8px); 
+        }
+
+        /* Dekorasi tambahan agar tidak polos */
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232563eb' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
     </style>
 </head>
-<body>
+<body class="pb-10">
+    <div class="bg-pattern"></div>
 
-    <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-8 text-center shadow-2xl rounded-b-3xl">
-        <h1 class="text-4xl font-extrabold tracking-tighter drop-shadow-md">RED FINGER STORE</h1>
-        <p class="text-sm mt-2 opacity-90 text-yellow-300 uppercase font-bold tracking-widest">Premium Service & Fast Process</p>
+    <header class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white pt-10 pb-16 px-6 text-center shadow-2xl rounded-b-[3rem]">
+        <h1 class="text-4xl font-black tracking-tight mb-2 uppercase italic">Neon Store</h1>
+        <p class="text-blue-100 font-medium tracking-widest text-xs opacity-80 uppercase">Red Finger Redeem Code & Joki Service</p>
     </header>
 
-    <div class="max-w-4xl mx-auto p-4 md:p-8">
+    <div class="max-w-4xl mx-auto px-4 -mt-10">
         
-        <div class="bg-white/80 backdrop-blur border-l-4 border-blue-600 p-5 mb-8 text-sm text-gray-700 rounded-xl shadow-sm">
-            <h3 class="font-bold text-lg mb-2 text-blue-700 flex items-center gap-2">
-                <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-xs uppercase">Info</span> Aturan Jasa Joki
+        <div class="bg-white/90 backdrop-blur border-l-8 border-blue-600 p-5 mb-8 rounded-2xl shadow-xl">
+            <h3 class="font-bold text-blue-700 mb-1 flex items-center gap-2">
+                📢 ATURAN JOKI
             </h3>
-            <ul class="list-disc ml-5 space-y-1 font-medium text-[13px]">
-                <li>JASA JOKI = SEPAKET SAMA CODE.</li>
-                <li>CODE WAJIB DARI ADMIN.</li>
-                <li>Akun wajib diamankan buyer setelah proses selesai.</li>
-            </ul>
+            <p class="text-[11px] text-gray-600 leading-relaxed font-semibold uppercase">
+                Joki sepaket dengan code • Code wajib dari admin • Akun wajib diamankan buyer setelah selesai.
+            </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-                <h2 class="text-xl font-black mb-4 text-gray-800 border-b-4 border-blue-600 inline-block px-1">DAFTAR CODE</h2>
-                <div class="space-y-4" id="list-code"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <h2 class="text-lg font-black text-blue-900 flex items-center gap-2">
+                    <span class="w-2 h-6 bg-blue-600 rounded-full"></span> DAFTAR CODE
+                </h2>
+                <div id="list-code" class="space-y-3"></div>
             </div>
 
-            <div>
-                <h2 class="text-xl font-black mb-4 text-gray-800 border-b-4 border-blue-400 inline-block px-1">JASA JOKI</h2>
-                <div class="space-y-4" id="list-joki"></div>
+            <div class="space-y-4">
+                <h2 class="text-lg font-black text-blue-900 flex items-center gap-2">
+                    <span class="w-2 h-6 bg-cyan-500 rounded-full"></span> JASA JOKI
+                </h2>
+                <div id="list-joki" class="space-y-3"></div>
             </div>
         </div>
 
-        <div class="mt-12 bg-white p-8 rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-cyan-400"></div>
-            <h3 class="text-2xl font-black mb-6 text-center text-gray-800 tracking-tight">RINGKASAN PESANAN</h3>
+        <div class="mt-10 bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 md:p-8">
+            <h2 class="text-xl font-black text-center text-gray-800 mb-6 uppercase tracking-widest">Detail Pesanan</h2>
             
-            <div class="mb-6 bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
-                <p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-3">Item yang anda pilih:</p>
-                <div id="cart-items" class="text-gray-800 font-bold text-base space-y-2 mb-4 min-h-[50px]">
-                    <span class="text-gray-400 font-normal italic">Belum ada item dipilih...</span>
+            <div class="bg-gray-50 rounded-2xl p-5 border-2 border-dashed border-gray-200 mb-6 text-center">
+                <div id="cart-items" class="text-sm font-bold text-blue-600 space-y-2 mb-3">
+                    <span class="text-gray-400 font-normal">Belum ada paket dipilih...</span>
                 </div>
-                <div class="border-t border-blue-200 pt-4 flex justify-between items-center">
-                    <span class="text-gray-600 font-bold text-lg">Total Bayar:</span>
-                    <span id="total-price" class="text-2xl font-black text-blue-600">Rp 0</span>
+                <div class="text-2xl font-black text-gray-900 border-t pt-3 flex justify-between items-center px-4">
+                    <span class="text-sm text-gray-500 uppercase">Total:</span>
+                    <span id="total-price" class="text-blue-600">Rp 0</span>
                 </div>
             </div>
 
-            <div class="mb-8">
-                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Nama / Nickname Anda</label>
-                <input type="text" id="buyer-name" placeholder="Contoh: NeonGamer" class="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-blue-500 transition-all font-bold text-gray-700 shadow-sm">
+            <div class="space-y-4 mb-8">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Nama Buyer</label>
+                    <input type="text" id="buyer-name" placeholder="Masukkan Nickname Anda" class="w-full bg-gray-50 p-4 rounded-2xl border-2 border-transparent focus:border-blue-500 outline-none font-bold transition-all shadow-inner">
+                </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-4">
-                <button onclick="showQRIS()" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-black py-4 rounded-2xl shadow-lg transition transform active:scale-95 flex justify-center items-center gap-2">
-                    LIHAT QRIS
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="showQRIS()" class="bg-slate-800 text-white font-black py-4 rounded-2xl hover:bg-slate-900 transition flex items-center justify-center gap-2 shadow-lg">
+                    🖼️ LIHAT QRIS
                 </button>
-                <button onclick="sendToWhatsApp()" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black py-4 rounded-2xl shadow-xl transition transform active:scale-95 flex justify-center items-center gap-2">
-                    PESAN SEKARANG (WA)
+                <button onclick="sendToWhatsApp()" class="bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg">
+                    💬 PESAN SEKARANG
                 </button>
             </div>
-            <button onclick="resetCart()" class="w-full mt-6 text-gray-400 text-[11px] font-bold hover:text-red-500 uppercase tracking-tighter transition">Mulai ulang pilihan</button>
+            <button onclick="resetCart()" class="w-full mt-6 text-gray-400 text-[10px] font-black uppercase hover:text-red-500 transition tracking-widest">Reset Pilihan</button>
         </div>
     </div>
 
     <div id="qris-modal" class="flex items-center justify-center p-4" onclick="hideQRIS()">
-        <div class="bg-white rounded-[2rem] max-w-sm w-full p-8 text-center relative shadow-2xl border-4 border-blue-600" onclick="event.stopPropagation()">
-            <button onclick="hideQRIS()" class="absolute -top-4 -right-4 bg-red-500 text-white w-10 h-10 rounded-full text-2xl font-bold shadow-lg hover:bg-red-600 transition">&times;</button>
-            <h3 class="text-xl font-black mb-2 text-gray-800">QRIS NEON STORE</h3>
-            <p class="text-[10px] text-blue-500 font-bold uppercase tracking-widest mb-6 underline">Scan untuk pembayaran otomatis</p>
+        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 text-center relative shadow-2xl border-4 border-blue-600" onclick="event.stopPropagation()">
+            <button onclick="hideQRIS()" class="absolute -top-3 -right-3 bg-red-500 text-white w-10 h-10 rounded-full font-bold shadow-xl">&times;</button>
+            <h3 class="text-xl font-black text-gray-800 mb-1">QRIS NEON STORE</h3>
+            <p class="text-[9px] text-blue-500 font-black uppercase mb-4 tracking-tighter">Scan untuk memproses pesanan</p>
             
-            <div class="bg-gray-100 p-3 rounded-2xl mb-4">
+            <div class="bg-gray-100 p-2 rounded-2xl mb-4 border-2 border-gray-50 shadow-inner">
                 <img src="https://raw.githubusercontent.com/neon300901/red-finger/main/295130.jpg" 
-                     alt="QRIS NEON" 
-                     class="w-full rounded-xl shadow-inner border-2 border-white"
-                     onerror="this.src='https://via.placeholder.com/400x600?text=Scan+QRIS+Neon+Gagal+Muat'">
+                     class="w-full rounded-xl"
+                     onerror="this.src='https://via.placeholder.com/400x550?text=Gambar+QRIS+Error+Cek+Nama+File'">
             </div>
             
-            <p class="text-[11px] text-gray-400 font-medium italic leading-relaxed">Simpan kode QR di atas, buka aplikasi m-banking atau e-wallet, lalu upload/scan gambar ini.</p>
-            <button onclick="hideQRIS()" class="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-black hover:bg-blue-700 transition shadow-lg">SAYA SUDAH SCAN</button>
+            <p class="text-[10px] text-gray-400 font-bold italic">Simpan/Screenshot QRIS di atas untuk membayar.</p>
         </div>
     </div>
 
@@ -132,20 +138,23 @@
         ];
 
         const jokiProducts = [
-            { id: 7, name: "Joki War Normal", price: 12000, desc: "Sangat Rekomendasi" },
-            { id: 8, name: "Joki Prio", price: 20000, desc: "Layanan Prioritas 24 Jam" },
-            { id: 9, name: "Joki Req Server SG", price: 35000, desc: "Server Premium (Hoki)" }
+            { id: 7, name: "Joki War Normal", price: 12000, desc: "Proses 10M-3D" },
+            { id: 8, name: "Joki Prio", price: 20000, desc: "Bebas Antri + Setting" },
+            { id: 9, name: "Joki Req Server SG", price: 35000, desc: "Server High Quality" }
         ];
 
-        function initApp() {
+        function render() {
             const codeC = document.getElementById('list-code');
             const jokiC = document.getElementById('list-joki');
+            
+            codeC.innerHTML = ''; 
+            jokiC.innerHTML = '';
 
             codeProducts.forEach(p => {
                 const d = document.createElement('div');
                 d.id = `prod-${p.id}`;
-                d.className = "product-card bg-white p-5 rounded-2xl border-2 border-white shadow-sm cursor-pointer flex justify-between items-center hover:shadow-md hover:border-blue-100";
-                d.innerHTML = `<div><p class="font-black text-gray-800">${p.name}</p><p class="text-blue-600 font-black">Rp ${p.price.toLocaleString()}</p></div><div class="w-8 h-8 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-200 font-bold">+</div>`;
+                d.className = "product-card bg-white p-4 rounded-2xl border-2 border-white shadow-sm cursor-pointer flex justify-between items-center hover:shadow-md";
+                d.innerHTML = `<div><p class="font-black text-gray-800 text-sm">${p.name}</p><p class="text-blue-600 font-black">Rp ${p.price.toLocaleString()}</p></div><div class="text-blue-200 font-black">+</div>`;
                 d.onclick = () => toggleCart(p);
                 codeC.appendChild(d);
             });
@@ -153,8 +162,8 @@
             jokiProducts.forEach(p => {
                 const d = document.createElement('div');
                 d.id = `prod-${p.id}`;
-                d.className = "product-card bg-white p-5 rounded-2xl border-2 border-white shadow-sm cursor-pointer flex justify-between items-center hover:shadow-md hover:border-blue-100";
-                d.innerHTML = `<div><p class="font-black text-gray-800">${p.name}</p><p class="text-emerald-500 font-black text-sm">Rp ${p.price.toLocaleString()}</p><p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-1">${p.desc}</p></div><div class="w-8 h-8 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-200 font-bold">+</div>`;
+                d.className = "product-card bg-white p-4 rounded-2xl border-2 border-white shadow-sm cursor-pointer flex justify-between items-center hover:shadow-md";
+                d.innerHTML = `<div><p class="font-black text-gray-800 text-sm">${p.name}</p><p class="text-cyan-600 font-black">Rp ${p.price.toLocaleString()}</p><p class="text-[9px] text-gray-400 font-bold uppercase">${p.desc}</p></div><div class="text-cyan-200 font-black">+</div>`;
                 d.onclick = () => toggleCart(p);
                 jokiC.appendChild(d);
             });
@@ -177,11 +186,11 @@
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('total-price');
             if (cart.length === 0) {
-                container.innerHTML = `<span class="text-gray-400 font-normal italic text-sm">Belum ada item dipilih...</span>`;
+                container.innerHTML = `<span class="text-gray-400 font-normal">Belum ada paket dipilih...</span>`;
                 totalEl.innerHTML = "Rp 0";
                 return;
             }
-            container.innerHTML = cart.map(i => `<div class="flex justify-between items-center bg-white p-2 rounded-lg text-sm border border-blue-50"><span>• ${i.name}</span><span class="font-black text-blue-600">Rp ${i.price.toLocaleString()}</span></div>`).join('');
+            container.innerHTML = cart.map(i => `<div class="bg-white p-2 rounded-lg mb-1 shadow-sm flex justify-between px-4 italic"><span>${i.name}</span><span>Rp ${i.price.toLocaleString()}</span></div>`).join('');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             totalEl.innerHTML = `Rp ${total.toLocaleString()}`;
         }
@@ -192,23 +201,22 @@
             updateCartUI();
         }
 
-        function showQRIS() { 
-            document.getElementById('qris-modal').style.display = 'flex';
-        }
-        function hideQRIS() { 
-            document.getElementById('qris-modal').style.display = 'none'; 
-        }
+        function showQRIS() { document.getElementById('qris-modal').style.display = 'flex'; }
+        function hideQRIS() { document.getElementById('qris-modal').style.display = 'none'; }
 
         function sendToWhatsApp() {
             const name = document.getElementById('buyer-name').value;
-            if (!name || cart.length === 0) { alert("Wajib isi nama dan pilih paket dulu bro!"); return; }
+            if (!name || cart.length === 0) { alert("Wajib isi nama dan pilih paket bosku!"); return; }
             const itemsStr = cart.map(i => `✅ ${i.name} (Rp ${i.price.toLocaleString()})`).join('%0A');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const msg = `*ORDER BARU - NEON STORE*%0A------------------------------------%0A👤 *Nama Buyer:* ${name}%0A🛒 *Item Pesanan:*%0A${itemsStr}%0A------------------------------------%0A💰 *TOTAL BAYAR:* Rp ${total.toLocaleString()}%0A------------------------------------%0AHalo Admin, saya mau order paket di atas. Saya sudah cek QRIS, mohon instruksinya!`;
+            const msg = `*PESANAN BARU - NEON STORE*%0A------------------------------------%0A👤 *Nama:* ${name}%0A🛒 *Item:*%0A${itemsStr}%0A------------------------------------%0A💰 *TOTAL:* Rp ${total.toLocaleString()}%0A------------------------------------%0AHalo Admin, saya mau order paket di atas. Saya sudah cek QRIS, mohon instruksinya!`;
             window.open(`https://wa.me/${myPhoneNumber}?text=${msg}`, '_blank');
         }
 
-        window.onload = initApp;
+        // Pancingan agar list PASTI muncul saat web terbuka
+        document.addEventListener("DOMContentLoaded", function() {
+            render();
+        });
     </script>
 </body>
 </html>
